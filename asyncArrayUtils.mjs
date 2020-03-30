@@ -73,3 +73,46 @@ export const every = async function asyncEvery(array, asyncFunction) {
     }
     return !didAnyFail;
 };
+
+export const extendedIndexOf_sync = function deepSearch(array, syncFunction) {
+    if (array instanceof Set) { array = [...array]; }
+    const defaultResult = -1;
+    for (let i = 0; i < array.length; i++) {
+        const result = syncFunction(array[i], i, array);
+        if (result) {
+            return result;
+        }
+    }
+    return defaultResult;
+};
+export const extendedIndexOf = async function deepSearchAsync(array, asyncFunction) {
+    if (array instanceof Set) { array = [...array] }
+    const defaultResult = -1;
+    for (let i = 0; i < array.length; i++) {
+        const result = await asyncFunction(array[i], i, array);
+        if (result) { return result; }
+    }
+    return defaultResult;
+};
+export const extendedLastIndexOf = async function deepSearchFromEndAsync(array, asyncFunction) {
+    if (array instanceof Set) {
+        array = [...array];
+    }
+    const defaultResult = -1;
+    for (let i = array.length; i > 0; i--) {
+        const result = await asyncFunction(array[i - 1], i - 1, array);
+        if (result) { return result; }
+    }
+    return defaultResult;
+};
+export const extendedLastIndexOf_sync = function deepSearchFromEnd(array, syncFunction) {
+    if (array instanceof Set) {
+        array = [...array];
+    }
+    const defaultResult = -1;
+    for (let i = array.length; i > 0; i--) {
+        const result = syncFunction(array[i - 1], i - 1, array);
+        if (result) { return result; }
+    }
+    return defaultResult;
+};
