@@ -116,3 +116,15 @@ export const extendedLastIndexOf_sync = function deepSearchFromEnd(array, syncFu
     }
     return defaultResult;
 };
+export const filter = async function filterAsync(array, asyncBooleanFunction) {
+    if (array instanceof Set) {
+        array = [...array];
+    }
+    const filteredArray = [];
+    for (let i = 0; i < array.length; i++) {
+        if (await asyncBooleanFunction(array[i], i, array)) {
+            filteredArray.push(array[i]);
+        }
+    }
+    return filteredArray;
+};
