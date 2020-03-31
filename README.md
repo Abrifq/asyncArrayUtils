@@ -10,7 +10,7 @@ There is a `extendedIndexOf` function set if you wanted to search via functions'
 ### 1. Node
 Since we have a package.json in, it should be possible to import via
 ```js
-const asyncArrayUtils = require("./*path*/asyncArrayUtils");
+const asyncArrayUtils = require("./*path*/asyncArrayUtils/");
 ```
 but if it doesn't work for some reason, just put `node.js` at the end of it!
 ```js
