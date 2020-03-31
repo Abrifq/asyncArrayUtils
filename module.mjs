@@ -1,3 +1,7 @@
+/**
+ * @returns {Array}
+ * @param {Set|TypedArray|Array} arrayLike 
+ */
 const arrayConverter = arrayLike => {
     const convertAllowedTypes = [Set, Object.getPrototypeOf(Uint8Array)];
     if (convertAllowedTypes.some(type => arrayLike instanceof type)) {
@@ -5,7 +9,11 @@ const arrayConverter = arrayLike => {
     }
     return arrayLike;
 };
-
+/**
+ * 
+ * @param {Array} array 
+ * @param {} asyncFunction 
+ */
 export const some = async function asyncSome(array, asyncFunction) {
     array = arrayConverter(array);
     let doesSomeResolveToTrue = false;

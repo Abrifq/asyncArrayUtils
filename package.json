@@ -1,0 +1,25 @@
+{
+  "name": "async-array-utils",
+  "version": "1.0.3",
+  "description": "Bunch of array function's replica and some extras.",
+  "main": "node.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fbarda/asyncArrayUtils.git"
+  },
+  "keywords": [
+    "async",
+    "array",
+    "utility",
+    "search"
+  ],
+  "author": "fbarda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fbarda/asyncArrayUtils/issues"
+  },
+  "homepage": "https://github.com/fbarda/asyncArrayUtils#readme"
+}
