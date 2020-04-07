@@ -1,6 +1,44 @@
 /**
- * @returns {Array}
- * @param {Set|TypedArray|Array} arrayLike 
+ * @callback AsyncArrayIteratorFunction
+ * @param {*} item - The item of the iterated array.
+ * @param {number} index - The index of the item in the iterated array.
+ * @param {Array<*>} array - The iterated array.
+ * @returns {Promise<*>}
+ * @async
+ * 
+ */
+/**
+ * @callback ArrayIteratorBooleanFunction
+ * @param {*} item - The item of the iterated array.
+ * @param {number} index - The index of the item in the iterated array.
+ * @param {Array<*>} array - The iterated array.
+ * @returns {boolean}
+ */
+/**
+ * @callback AsyncArrayIteratorBooleanFunction
+ * @async
+ * @param {*} item - The item of the iterated array.
+ * @param {number} index - The index of the item in the iterated array.
+ * @param {Array<*>} array - The iterated array.
+ * @returns {Promise<boolean>}
+ */
+/**
+ * @callback AsyncArrayIteratorVoidFunction 
+ * @param {*} item - The item of the iterated array.
+ * @param {number} index - The index of the item in the iterated array.
+ * @param {Array<*>} array - The iterated array.
+ * @async
+ * @returns {Promise<void>}
+ */
+/**
+ * @callback AsyncArrayReducerFunction
+ * @param {*} initialValue - The result of the previous iteration.
+ * @param {*} currentItem - The next item from the array being reduced.
+ * @returns {Promise<*>} - Will be awaited and used in next iteration.
+ */
+/**
+ * @returns { Array }
+ * @param { Set | Array | Uint8Array | Uint16Array | Uint32Array | Uint8ClampedArray } arrayLike 
  */
 const arrayConverter = arrayLike => {
     const convertAllowedTypes = [Set, Object.getPrototypeOf(Uint8Array)];
@@ -10,9 +48,10 @@ const arrayConverter = arrayLike => {
     return arrayLike;
 };
 /**
- * 
- * @param {Array} array 
- * @param {} asyncFunction 
+ * @param {Array} array
+ * @param {AsyncArrayIteratorBooleanFunction} asyncFunction
+ * @returns {Promise<boolean>}
+ * @async
  */
 exports.some = async function asyncSome(array, asyncFunction) {
     array = arrayConverter(array);
@@ -25,6 +64,16 @@ exports.some = async function asyncSome(array, asyncFunction) {
     }
     return doesSomeResolveToTrue;
 };
+/**
+ * @deprecated - And will be refactored in a near time for better syntax
+ * @desc - This one has a different approach to mapping. Please see the example
+ * @param {Array} array
+ * @returns {{
+    array:Array,
+    map(asyncFunction:AsyncArrayIteratorFunction)=>Promise<Array>
+    }}
+ *@example `mapConstructor([1,2,3]).map(getSquareAsync).then(mapObj=>mapObj.array).then(console.log) //Expected async output: [1,4,9]`
+ */
 exports.mapConstructor = function asyncArrayMapConstructor(array) {
     const self = {
         array: [...arrayConverter(array)],
@@ -37,6 +86,13 @@ exports.mapConstructor = function asyncArrayMapConstructor(array) {
     };
     return self;
 };
+/**
+ * @async
+ * @param {Array} array
+ * @param {AsyncArrayReducerFunction} asyncFunction
+ * @param {*} initialValue
+ * @returns { Promise<*> }
+ */
 exports.reduceRight = async function asyncReduceRight(array, asyncFunction, initialValue) {
     array = arrayConverter(array);
     let i = array.length - 1;
@@ -48,6 +104,13 @@ exports.reduceRight = async function asyncReduceRight(array, asyncFunction, init
         initialValue = await asyncFunction(initialValue, array[i], i, array);
     }
 };
+/**
+ * @async
+ * @param {Array} array
+ * @param {AsyncArrayReducerFunction} asyncFunction
+ * @param {*} initialValue
+ * @returns { Promise<*> }
+ */
 exports.reduce = async function asyncReduce(array, asyncFunction, initialValue) {
     array = arrayConverter(array);
     let i = 0;
@@ -60,6 +123,12 @@ exports.reduce = async function asyncReduce(array, asyncFunction, initialValue) 
     }
     return initialValue;
 };
+/**
+ * @param {Array} array
+ * @param {AsyncArrayIteratorVoidFunction} asyncFunction
+ * @returns {Promise<void>}
+ * @async
+ */
 exports.forEach = async function asyncForEach(array, asyncFunction) {
     const copiedArray = [...arrayConverter(array)];
     let promiseChain = Promise.resolve();
@@ -70,6 +139,12 @@ exports.forEach = async function asyncForEach(array, asyncFunction) {
     }
     return;
 };
+/**
+ * @param {Array} array
+ * @param {AsyncArrayIteratorBooleanFunction} asyncFunction
+ * @returns {Promise<boolean>}
+ * @async
+ */
 exports.every = async function asyncEvery(array, asyncFunction) {
     array = arrayConverter(array);
     let didAnyFail = false;
@@ -81,45 +156,72 @@ exports.every = async function asyncEvery(array, asyncFunction) {
     }
     return !didAnyFail;
 };
-
+/**
+ * @param {Array} array
+ * @param {ArrayIteratorBooleanFunction} syncFunction
+ * @returns {number}
+ */
 exports.extendedIndexOf_sync = function deepSearch(array, syncFunction) {
     array = arrayConverter(array);
     const defaultResult = -1;
     for (let i = 0; i < array.length; i++) {
         const result = syncFunction(array[i], i, array);
         if (result) {
-            return result;
+            return i;
         }
     }
     return defaultResult;
 };
+/**
+ * @param {Array} array
+ * @param {AsyncArrayIteratorBooleanFunction} asyncFunction
+ * @returns {Promise<number>}
+ * @async
+ */
 exports.extendedIndexOf = async function deepSearchAsync(array, asyncFunction) {
     array = arrayConverter(array);
     const defaultResult = -1;
     for (let i = 0; i < array.length; i++) {
         const result = await asyncFunction(array[i], i, array);
-        if (result) { return result; }
+        if (result) { return i; }
     }
     return defaultResult;
 };
+/**
+ * @param {Array} array
+ * @param {AsyncArrayIteratorBooleanFunction} asyncFunction
+ * @returns {Promise<number>}
+ * @async
+ */
 exports.extendedLastIndexOf = async function deepSearchFromEndAsync(array, asyncFunction) {
     array = arrayConverter(array);
     const defaultResult = -1;
     for (let i = array.length; i > 0; i--) {
         const result = await asyncFunction(array[i - 1], i - 1, array);
-        if (result) { return result; }
+        if (result) { return i - 1; }
     }
     return defaultResult;
 };
+/**
+ * @param {Array} array
+ * @param {ArrayIteratorBooleanFunction} syncFunction
+ * @returns {number}
+ */
 exports.extendedLastIndexOf_sync = function deepSearchFromEnd(array, syncFunction) {
     array = arrayConverter(array);
     const defaultResult = -1;
     for (let i = array.length; i > 0; i--) {
         const result = syncFunction(array[i - 1], i - 1, array);
-        if (result) { return result; }
+        if (result) { return i - 1; }
     }
     return defaultResult;
 };
+/**
+ * @param {Array} array
+ * @returns {Promise<Array>}
+ * @param {AsyncArrayIteratorBooleanFunction} asyncBooleanFunction
+ * @async
+ */
 exports.filter = async function filterAsync(array, asyncBooleanFunction) {
     array = arrayConverter(array);
     const filteredArray = [];
