@@ -1,16 +1,16 @@
 const arrayConverter = require("./arrayConverter");
 /**
- * @param {Array} array
+ * @param {import("./types").ArrayLike} array
  * @param {import("./types").AsyncArrayIteratorVoidFunction} asyncFunction
  * @returns {Promise<void>}
  * @async
  */
 module.exports = exports = async function asyncForEach(array, asyncFunction) {
-    const copiedArray = [...arrayConverter(array)];
+    array = arrayConverter(array); //Overwrite old reference, for GC.
     let promiseChain = Promise.resolve();
-    for (let i = 0; i < copiedArray.length; i++) {
+    for (let i = 0; i < array.length; i++) {
         await promiseChain; //added await here instead of end of the loop to prevent side-effects. May increase time spent on chain.
-        const currentPromise = asyncFunction(copiedArray[i], i, copiedArray);
+        const currentPromise = asyncFunction(array[i], i, array);
         promiseChain = promiseChain.then(currentPromise);
     }
     return;

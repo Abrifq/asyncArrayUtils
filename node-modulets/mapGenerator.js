@@ -1,19 +1,18 @@
 const arrayConverter = require("./arrayConverter");
 
 /**
- * 
- * @param {*} array 
- * @param {*} asyncFunction 
+ * @param {import("./types").ArrayLike} array 
+ * @param {import("./types").AsyncArrayIteratorFunction} asyncFunction 
  * @generator
  * @returns {{next:GeneratorIterator, return:GeneratorIterator, throw:GeneratorIterator }}
  */
 module.exports = exports = function* asyncIteratedMap(array, asyncFunction) {
-    const copiedArray = arrayConverter(array);
-    for (let index = 0; index < copiedArray.length; index++) {
-        yield asyncFunction(copiedArray[index], index, copiedArray);
+    array = arrayConverter(array); //Overwrite old reference, for GC.
+    for (let index = 0; index < array.length; index++) {
+        yield asyncFunction(array[index], index, array);
     }
 };
-
+//Some type declarations just in case something goes wrong
 /**@typedef GeneratorResult
  * @prop {* | undefined} value
  * @prop {boolean} done

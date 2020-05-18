@@ -40,3 +40,4 @@ module.exports=""; //You need to export something to export types. Don't know wh
  * @returns {Promise<*>} - Will be awaited and used in next iteration.
  * @async
  */
+/**@typedef { Set | Array | Uint8Array | Uint16Array | Uint32Array | Uint8ClampedArray} ArrayLike */

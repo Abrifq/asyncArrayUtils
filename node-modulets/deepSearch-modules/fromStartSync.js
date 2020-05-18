@@ -1,6 +1,6 @@
 const arrayConverter = require("../arrayConverter");
 /**
- * @param {Array} array
+ * @param {import("../types").ArrayLike} array
  * @param {import("../types").ArrayIteratorBooleanFunction} syncFunction
  * @returns {number}
  */
