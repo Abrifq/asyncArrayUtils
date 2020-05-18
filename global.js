@@ -36,6 +36,16 @@
  * @param {*} currentItem - The next item from the array being reduced.
  * @returns {Promise<*>} - Will be awaited and used in next iteration.
  */
+/**@typedef GeneratorResult
+ * @prop {* | undefined} value
+ * @prop {boolean} done
+ */
+
+/**@callback GeneratorIterator
+ * @param {*=} nextYieldParameter
+ * @returns {GeneratorResult}
+ * @throws {Error | Promise<undefined,Error>} - Can throw any error from generator.throw() or the sub-function asyncFunction.
+ */
 /**@const */
 const asyncArrayUtils = {};
 {
@@ -44,11 +54,11 @@ const asyncArrayUtils = {};
      * @param { Set | Array | Uint8Array | Uint16Array | Uint32Array | Uint8ClampedArray } arrayLike 
      */
     const arrayConverter = arrayLike => {
-        const convertAllowedTypes = [Set, Object.getPrototypeOf(Uint8Array)];
+        const convertAllowedTypes = [Array, Set, Object.getPrototypeOf(Uint8Array)];
         if (convertAllowedTypes.some(type => arrayLike instanceof type)) {
             return [...arrayLike];
         }
-        return arrayLike;
+        throw "Incompatible type.";
     };
     /**
      * @async
@@ -68,27 +78,19 @@ const asyncArrayUtils = {};
         return doesSomeResolveToTrue;
     };
     /**
-     * @deprecated - And will be refactored in a near time for better syntax
-     * @desc - This one has a different approach to mapping. Please see the example
-     * @param {Array} array
-     * @returns {{
-     array:Array,
-     map(asyncFunction:AsyncArrayIteratorFunction)=>Promise<Array>
-     }}
-     *@example `mapConstructor([1,2,3]).map(getSquareAsync).then(mapObj=>mapObj.array).then(console.log) //Expected async output: [1,4,9]`
+     * @param {ArrayLike} array 
+     * @param {AsyncArrayIteratorFunction} asyncFunction 
+     * @generator
+     * @returns {{next:GeneratorIterator, return:GeneratorIterator, throw:GeneratorIterator }}
      */
-    asyncArrayUtils.mapConstructor = function asyncArrayMapConstructor(array) {
-        const self = {
-            array: [...arrayConverter(array)],
-            map: async function (asyncFunction) {
-                for (let i = 0; i < this.array.length; i++) {
-                    this.array[i] = await asyncFunction(this.array[i], i, this.array);
-                }
-                return self;
-            }
-        };
-        return self;
+    asyncArrayUtils.map = function* asyncIteratedMap(array, asyncFunction) {
+        array = arrayConverter(array); //Overwrite old reference, for GC.
+        for (let index = 0; index < array.length; index++) {
+            yield asyncFunction(array[index], index, array);
+        }
     };
+    //Some type declarations just in case something goes wrong
+
     /**
      * @async
      * @param {Array} array
@@ -133,11 +135,11 @@ const asyncArrayUtils = {};
      * @async
      */
     asyncArrayUtils.forEach = async function asyncForEach(array, asyncFunction) {
-        const copiedArray = [...arrayConverter(array)];
+        array = arrayConverter(array);
         let promiseChain = Promise.resolve();
-        for (let i = 0; i < copiedArray.length; i++) {
+        for (let i = 0; i < array.length; i++) {
             await promiseChain; //added await here instead of end of the loop to prevent side-effects. May increase time spent on chain.
-            const currentPromise = asyncFunction(copiedArray[i], i, copiedArray);
+            const currentPromise = asyncFunction(array[i], i, array);
             promiseChain = promiseChain.then(currentPromise);
         }
         return;
