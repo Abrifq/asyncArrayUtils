@@ -1,7 +1,7 @@
 const arrayConverter = require("../arrayConverter");
 /**
  * @param {Array} array
- * @param {import("../arrayConverter.js").ArrayIteratorBooleanFunction} syncFunction
+ * @param {import("../types").ArrayIteratorBooleanFunction} syncFunction
  * @returns {number}
  */
 exports.end.sync = function deepSearchFromEnd(array, syncFunction) {

@@ -2,7 +2,7 @@ const arrayConverter = require("./arrayConverter");
 /**
  * @param {Array} array
  * @returns {Promise<Array>}
- * @param {import("./arrayConverter").AsyncArrayIteratorBooleanFunction} asyncBooleanFunction
+ * @param {import("./types").AsyncArrayIteratorBooleanFunction} asyncBooleanFunction
  * @async
  */
 module.exports = exports = async function filterAsync(array, asyncBooleanFunction) {

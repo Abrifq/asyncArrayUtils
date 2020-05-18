@@ -1,7 +1,7 @@
 const arrayConverter = require("./arrayConverter");
 /**
  * @param {Array} array
- * @param {import("./arrayConverter.js").AsyncArrayIteratorVoidFunction} asyncFunction
+ * @param {import("./types").AsyncArrayIteratorVoidFunction} asyncFunction
  * @returns {Promise<void>}
  * @async
  */

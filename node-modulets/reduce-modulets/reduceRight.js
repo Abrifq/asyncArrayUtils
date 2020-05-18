@@ -2,7 +2,7 @@ const arrayConverter = require("../arrayConverter");
 /**
  * @async
  * @param {Array} array
- * @param {import("../arrayConverter.js").AsyncArrayReducerFunction} asyncFunction
+ * @param {import("../types").AsyncArrayReducerFunction} asyncFunction
  * @param {*} initialValue
  * @returns { Promise<*> }
  */
